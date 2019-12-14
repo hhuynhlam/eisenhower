@@ -1,0 +1,35 @@
+AllCops:
+  Exclude:
+    - 'bin/**/*'
+    - 'doc/**/*'
+    - 'node_modules/**/*'
+    - 'config/boot.rb'
+    - 'Guardfile'
+  TargetRubyVersion: 2.3
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/LineLength:
+  Max: 100
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+Style/Lambda:
+  Enabled: false
