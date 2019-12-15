@@ -9,6 +9,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'jazz_fingers', '~> 4.0'
 gem 'mixlib-config', '~> 2.2'
 gem 'mongoid', '~> 7.0'
+gem 'omniauth-auth0', '~> 2.2'
 gem 'pry-rails', '~> 0.3'
 gem 'puma', '~> 3.11'
 gem 'rack-cors', require: 'rack/cors'
@@ -34,3 +35,5 @@ group :test do
   gem 'rails-controller-testing'
   gem 'shoulda-matchers'
 end
+
+gem "jwt", "~> 2.2"
