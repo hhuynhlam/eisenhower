@@ -5,8 +5,11 @@ ruby '2.6.5'
 
 gem 'rails', '~> 5.2.0'
 
+gem 'aasm', '~> 5.0'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'jazz_fingers', '~> 4.0'
+gem 'jbuilder', '~> 2.9'
+gem 'jwt', '~> 2.2'
 gem 'mixlib-config', '~> 2.2'
 gem 'mongoid', '~> 7.0'
 gem 'omniauth-auth0', '~> 2.2'
@@ -35,5 +38,3 @@ group :test do
   gem 'rails-controller-testing'
   gem 'shoulda-matchers'
 end
-
-gem "jwt", "~> 2.2"

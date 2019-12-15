@@ -5,6 +5,12 @@ Rails.application.routes.draw do
 
   get '/health', to: 'health#show'
 
+  # API
+  namespace :api do
+    resources :todo_items
+    resources :todo_lists
+  end
+
   # Authentication
   get '/login' => 'session#login'
   get '/logout' => 'session#logout'
@@ -12,11 +18,6 @@ Rails.application.routes.draw do
   namespace :auth do
     get '/auth0/callback' => 'auth0#callback'
     get '/auth0/failure' => 'auth0#failure'
-  end
-
-  # API
-  namespace :api do
-    resources :dashboards, only: %w[index]
   end
 
   # UI
