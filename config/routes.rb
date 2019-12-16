@@ -21,5 +21,5 @@ Rails.application.routes.draw do
   end
 
   # UI
-  get '/*path', single_page_app
+  get '/*path', to: redirect('/')
 end

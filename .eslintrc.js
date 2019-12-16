@@ -15,6 +15,14 @@ module.exports = {
     window: true,
   },
 
+  settings: {
+    'import/resolver': {
+      'babel-module': {
+        'root': ['./app/javascript/src'],
+      },
+    },
+  },
+
   plugins: [
     'jest',
   ],
