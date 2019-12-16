@@ -1,8 +1,8 @@
-import { connectRouter, routerMiddleware } from 'connected-react-router'
+import { routerMiddleware } from 'connected-react-router/immutable'
 import Immutable, { fromJS } from 'immutable'
 import { applyMiddleware, compose, createStore } from 'redux'
 import history from './history'
-import reducer from './reducer'
+import createReducer from './reducer'
 
 const devToolsExtension = window.devToolsExtension &&
     window.devToolsExtension({ serialize: { immutable: Immutable } })
@@ -12,7 +12,7 @@ const enhancers = (devToolsExtension) ?
   compose(applyMiddleware(routerMiddleware(history)))
 
 const store = createStore(
-  connectRouter(history)(reducer),
+  createReducer(history),
   fromJS({}),
   enhancers,
 )

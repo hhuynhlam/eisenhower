@@ -21,6 +21,13 @@ export default {
     neutralPrimary: '#f5f5f5',
     neutralDark: '#FDFDFD',
     black: '#FEFEFE',
+    grey: '#727272',
     white: '#262626',
+  },
+  breakpoints: {
+    xs: 480,
+    sm: 768,
+    md: 1024,
+    lg: 1200,
   },
 }

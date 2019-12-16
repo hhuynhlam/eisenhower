@@ -43,9 +43,10 @@ module.exports = {
 
     semi: ['error', 'never'],
 
-    'react/prop-types': ['off'],
     'react/forbid-prop-types': ['off'],
     'react/jsx-filename-extension': ['off'],
+    'react/no-array-index-key': ['off'],
     'react/no-multi-comp': ['off'],
+    'react/prop-types': ['off'],
   },
 }

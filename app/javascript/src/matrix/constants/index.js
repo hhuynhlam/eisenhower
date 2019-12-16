@@ -12,7 +12,15 @@ const COLUMN_TITLE = {
   [COLUMN_TYPE.WONTDO]: 'Won\'t Do',
 }
 
+const COLUMN_SUBTITLE = {
+  [COLUMN_TYPE.DELEGATE]: 'Urgent, Not Important',
+  [COLUMN_TYPE.DO]: 'Urgent, Important',
+  [COLUMN_TYPE.SCHEDULE]: 'Not Urgent, Important',
+  [COLUMN_TYPE.WONTDO]: 'Not Urgent, Not Important',
+}
+
 export default {
+  COLUMN_SUBTITLE,
   COLUMN_TITLE,
   COLUMN_TYPE,
 }

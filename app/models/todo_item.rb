@@ -7,6 +7,7 @@ class TodoItem < ApplicationRecord
 
   field :description, type: String
   field :important, type: Boolean
+  field :order, type: Integer
   field :urgent, type: Boolean
 
   validates :description, presence: true
