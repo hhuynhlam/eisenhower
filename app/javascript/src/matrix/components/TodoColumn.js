@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
+import useEventListener from '@use-it/event-listener'
 import { DetailsList, SelectionMode } from 'office-ui-fabric-react/lib/DetailsList'
-import { Draggable } from 'react-beautiful-dnd'
+import { useDispatch } from 'react-redux'
 import uuid from 'uuid/v1'
 import constants from '../constants'
 import * as Styled from './TodoColumn.styles'
+import ducks from '../ducks'
+import useTodoItems from '../hooks/useTodoItems'
+import useTodoTask from '../hooks/useTodoTask'
 
 const { COLUMN_SUBTITLE, COLUMN_TITLE, COLUMN_TYPE } = constants
 
@@ -15,50 +19,35 @@ const COLUMNS = [
   },
 ]
 
-const mockItems = [
-  {
-    description: 'Task 1',
-  },
-  {
-    description: 'Task 2',
-  },
-  {
-    description: 'Task 3',
-  },
-  {
-    description: 'Task 4',
-  },
-]
-
-function TodoTask(props) {
-  const {
-    item,
-    itemIndex,
-  } = props
-
-  return (
-    <Draggable draggableId={uuid()} index={itemIndex}>
-      {provided => (
-        <Styled.TaskItem
-          innerRef={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-        >
-          {item.description}
-        </Styled.TaskItem>
-      )}
-    </Draggable>
-  )
-}
-
 function TodoColumn(props) {
   const {
-    items = mockItems,
     type = COLUMN_TYPE.WONTDO,
   } = props
 
+  const dispatch = useDispatch()
+  const inputRef = useRef(null)
+  const [newTask, setNewTask] = useState('')
+  const items = useTodoItems(type)
+  console.log(items)
+
+  function handleAdd(value) {
+    const payload = { id: uuid(), description: value, type }
+
+    dispatch(ducks.updateItem(payload))
+    setNewTask('')
+  }
+  function handleChange(event, value) {
+    setNewTask(value)
+  }
+
+  useEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !!newTask) {
+      handleAdd(newTask)
+    }
+  }, inputRef.current)
+
   return (
-    <React.Fragment>
+    <div ref={inputRef}>
       <Styled.ColumnHeader type={type}>
         {COLUMN_TITLE[type]}
         <Styled.ColumnSubtitle>
@@ -67,17 +56,22 @@ function TodoColumn(props) {
       </Styled.ColumnHeader>
 
       <Styled.ColumnContent>
-        <Styled.ColumnInput label="New Task:" underlined />
+        <Styled.ColumnInput
+          label="New Task:"
+          onChange={handleChange}
+          underlined
+          value={newTask}
+        />
 
         <DetailsList
           columns={COLUMNS}
           isHeaderVisible={false}
           items={items}
-          onRenderRow={TodoTask}
+          onRenderRow={useTodoTask(type)}
           selectionMode={SelectionMode.none}
         />
       </Styled.ColumnContent>
-    </React.Fragment>
+    </div>
   )
 }
 
