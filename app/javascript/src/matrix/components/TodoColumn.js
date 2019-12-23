@@ -1,12 +1,11 @@
 import React, { useRef, useState } from 'react'
 import useEventListener from '@use-it/event-listener'
 import { DetailsList, SelectionMode } from 'office-ui-fabric-react/lib/DetailsList'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import uuid from 'uuid/v1'
 import constants from '../constants'
 import * as Styled from './TodoColumn.styles'
 import ducks from '../ducks'
-import useTodoItems from '../hooks/useTodoItems'
 import useTodoTask from '../hooks/useTodoTask'
 
 const { COLUMN_SUBTITLE, COLUMN_TITLE, COLUMN_TYPE } = constants
@@ -27,15 +26,20 @@ function TodoColumn(props) {
   const dispatch = useDispatch()
   const inputRef = useRef(null)
   const [newTask, setNewTask] = useState('')
-  const items = useTodoItems(type)
-  console.log(items)
+  const items = useSelector(ducks.selectSortedItems(type))
 
   function handleAdd(value) {
-    const payload = { id: uuid(), description: value, type }
+    const payload = {
+      id: uuid(),
+      description: value,
+      type,
+    }
 
-    dispatch(ducks.updateItem(payload))
+    dispatch(ducks.addItem(payload))
+
     setNewTask('')
   }
+
   function handleChange(event, value) {
     setNewTask(value)
   }

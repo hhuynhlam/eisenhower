@@ -29,7 +29,7 @@ function useTodoTask(type) {
     } = props
 
     return (
-      <Draggable draggableId={item.description} index={itemIndex}>
+      <Draggable key={item.id} draggableId={item.id} index={itemIndex}>
         {provided => (
           <Styled.TaskItem
             innerRef={provided.innerRef}

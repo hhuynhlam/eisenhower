@@ -1,15 +1,9 @@
-import { filter, map, pipe } from 'lodash/fp'
-import { useSelector } from 'react-redux'
 import constants from '../constants'
-import ducks from '../ducks'
-
-const _map = map.convert({ cap: false })
 
 const { COLUMN_TYPE } = constants
 
-function useTodoItems(type) {
+function getColumnTypeFilters(type) {
   const filters = {}
-  const items = useSelector(ducks.selectItems)
 
   switch (type) {
     case COLUMN_TYPE.DO:
@@ -29,10 +23,7 @@ function useTodoItems(type) {
       filters.urgent = false
   }
 
-  return pipe([
-    _map((val, key) => ({ id: key, ...val })),
-    filter(filters),
-  ])(items)
+  return filters
 }
 
-export default useTodoItems
+export default getColumnTypeFilters

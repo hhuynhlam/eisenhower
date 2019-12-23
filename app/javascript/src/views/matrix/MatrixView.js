@@ -9,10 +9,7 @@ function MatrixView() {
       <Header />
 
       <MatrixView.Content>
-        <Matrix onDragEnd={(reason, provided) => {
-          console.log(reason)
-          console.log(provided)
-        }} />
+        <Matrix />
       </MatrixView.Content>
     </React.Fragment>
   )
