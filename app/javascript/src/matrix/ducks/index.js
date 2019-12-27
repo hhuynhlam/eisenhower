@@ -1,38 +1,24 @@
-import { fromJS } from 'immutable'
+import produce from 'immer'
 import { LexoRank } from 'lexorank'
+import { update, omit, set } from 'lodash/fp'
 import getColumnTypeFilters from '../utils/getColumnTypeFilters'
 import sortColumnByRank from '../utils/sortColumnByRank'
 
 const NAMESPACE = 'matrix'
 
 /**
- * Selectors -----------------------------------------
- */
-function selectItems(state) {
-  return state.getIn([NAMESPACE, 'items']).toJS()
-}
-
-function selectSortedItems(type) {
-  return (state) => {
-    const items = state.getIn([NAMESPACE, 'items']).toJS()
-
-    return sortColumnByRank(type, items)
-  }
-}
-
-/**
  * Actions --------------------------------------------
  */
-const ADD_ITEM = `${NAMESPACE}.ADD_ITEM`
-const MOVE_ITEM = `${NAMESPACE}.MOVE_ITEM`
-const REMOVE_ITEM = `${NAMESPACE}.REMOVE_ITEM`
-const UPDATE_ITEM = `${NAMESPACE}.UPDATE_ITEM`
+const ITEM_ADDED = `${NAMESPACE}.ITEM_ADDED`
+const ITEM_MOVED = `${NAMESPACE}.ITEM_MOVED`
+const ITEM_REMOVED = `${NAMESPACE}.ITEM_REMOVED`
+const ITEM_UPDATED = `${NAMESPACE}.ITEM_UPDATED`
 
 function addItem(payload) {
   if (!payload.id) throw new Error('id is required')
 
   return {
-    type: ADD_ITEM,
+    type: ITEM_ADDED,
     payload,
   }
 }
@@ -42,7 +28,7 @@ function moveItem(draggableId, source, destination) {
   if (!source) throw new Error('source is required')
 
   return {
-    type: MOVE_ITEM,
+    type: ITEM_MOVED,
     payload: {
       draggableId,
       destination,
@@ -54,7 +40,7 @@ function removeItem(id) {
   if (!id) throw new Error('id is required')
 
   return {
-    type: REMOVE_ITEM,
+    type: ITEM_REMOVED,
     payload: { id },
   }
 }
@@ -64,7 +50,7 @@ function updateItem(payload) {
   if (!payload.type) throw new Error('type is required')
 
   return {
-    type: UPDATE_ITEM,
+    type: ITEM_UPDATED,
     payload,
   }
 }
@@ -72,24 +58,24 @@ function updateItem(payload) {
 /**
  * Reducer --------------------------------------------
  */
-const INITIAL_STATE = fromJS({
+const INITIAL_STATE = {
   items: {},
   minRank: LexoRank.middle().value,
-})
+}
 
 /**
- * Root
+ * First-Level
  */
 function reassignItemReducer(state, action) {
   const { destination, draggableId } = action.payload
 
-  return state.updateIn(['items', draggableId], item => (fromJS({
-    ...item.toJS(),
+  return update(['items', draggableId], item => ({
+    ...item,
     ...getColumnTypeFilters(destination.droppableId),
-  })))
+  }))(state)
 }
 function removeItemReducer(state, action) {
-  return state.deleteIn(['items', action.payload.id])
+  return omit(['items', action.payload.id])(state)
 }
 function updateItemReducer(state, action) {
   const { id, type, ...values } = action.payload
@@ -99,10 +85,10 @@ function updateItemReducer(state, action) {
     ...getColumnTypeFilters(type),
   }
 
-  return state.setIn(['items', id], fromJS(item))
+  return set(['items', id], item)(state)
 }
 function updateMinRankReducer(state, action) {
-  return state.set('minRank', action.payload.rank)
+  return set(['minRank'], action.payload.rank)(state)
 }
 
 
@@ -110,7 +96,7 @@ function updateMinRankReducer(state, action) {
  * Second-Level
  */
 function addItemReducer(state, action) {
-  const minRank = state.get('minRank')
+  const { minRank } = state
   const rank = LexoRank.parse(minRank).genPrev().value
 
   const newState = updateMinRankReducer(state, { payload: { rank } })
@@ -123,40 +109,41 @@ function addItemReducer(state, action) {
   return updateItemReducer(newState, { payload })
 }
 function reorderItemReducer(state, action) {
+  const { items } = state
+
   const { destination, draggableId } = action.payload
-  const items = state.getIn('items')
   const column = sortColumnByRank(destination.droppableId, items)
 
   // move to first rank
   if (destination.index === 0) {
     // column is empty
     if (column.length === 0) {
-      const minRank = state.get('minRank')
+      const { minRank } = state
       const rank = LexoRank.parse(minRank).genPrev().value
 
       const newState = updateMinRankReducer(state, { payload: { rank } })
 
-      return newState.setIn(['items', draggableId, 'rank'], rank)
+      return set(['items', draggableId, 'rank'], rank)(newState)
     }
 
     // column is not empty
     const nextRank = LexoRank.parse(column[destination.index + 1].rank)
 
-    return state.setIn(['items', draggableId, 'rank'], nextRank.genPrev().value)
+    return set(['items', draggableId, 'rank'], nextRank.genPrev().value)(state)
   }
 
   // move to last rank
   if (destination.index === column.length - 1) {
     const prevRank = LexoRank.parse(column[destination.index - 1].rank)
 
-    return state.setIn(['items', draggableId, 'rank'], prevRank.genNext().value)
+    return set(['items', draggableId, 'rank'], prevRank.genNext().value)(state)
   }
 
   // move to somewhere in between
   const prevRank = LexoRank.parse(column[destination.index - 1].rank)
   const nextRank = LexoRank.parse(column[destination.index + 1].rank)
 
-  return state.setIn(['items', draggableId, 'rank'], prevRank.between(nextRank).value)
+  return set(['items', draggableId, 'rank'], prevRank.between(nextRank).value)(state)
 }
 
 /**
@@ -174,21 +161,40 @@ function moveItemReducer(state, action) {
 }
 
 function reducer(state = INITIAL_STATE, action) {
-  switch (action.type) {
-    case ADD_ITEM:
-      return addItemReducer(state, action)
-    case MOVE_ITEM:
-      return moveItemReducer(state, action)
-    case REMOVE_ITEM:
-      return removeItemReducer(state, action)
-    case UPDATE_ITEM:
-      return updateItemReducer(state, action)
-    default:
-      return state
+  return produce(state, (draft) => {
+    switch (action.type) {
+      case ITEM_ADDED:
+        return addItemReducer(draft, action)
+      case ITEM_MOVED:
+        return moveItemReducer(draft, action)
+      case ITEM_REMOVED:
+        return removeItemReducer(draft, action)
+      case ITEM_UPDATED:
+        return updateItemReducer(draft, action)
+      default:
+        return draft
+    }
+  })
+}
+
+/**
+ * Selectors -----------------------------------------
+ */
+function selectItems(state) {
+  return state[NAMESPACE].items
+}
+
+function selectSortedItems(type) {
+  return (state) => {
+    const { items } = state[NAMESPACE]
+
+    return sortColumnByRank(type, items)
   }
 }
 
 export default {
+  NAMESPACE,
+
   addItem,
   moveItem,
   removeItem,

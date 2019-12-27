@@ -24,7 +24,7 @@
     "connected-react-router": "^6.5.1",
     "flexboxgrid": "^6.3.1",
     "history": "^4.10.1",
-    "immutable": "^3.8.2",
+    "immer": "^5.1.0",
     "lexorank": "^1.0.4",
     "lodash": "^4.17.10",
     "office-ui-fabric-react": "^7.73.0",
