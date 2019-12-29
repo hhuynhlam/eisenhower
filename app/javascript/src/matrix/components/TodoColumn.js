@@ -35,9 +35,8 @@ function TodoColumn(props) {
       type,
     }
 
-    dispatch(ducks.addItem(payload))
-
     setNewTask('')
+    dispatch(ducks.addItem(payload))
   }
 
   function handleChange(event, value) {

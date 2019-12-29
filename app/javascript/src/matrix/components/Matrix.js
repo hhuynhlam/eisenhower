@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DragDropContext, Droppable } from 'react-beautiful-dnd'
 import { useDispatch } from 'react-redux'
+import { ducks as data } from '../../data'
 import constants from '../constants'
 import ducks from '../ducks'
 import TodoColumn from './TodoColumn'
@@ -21,6 +22,10 @@ function Matrix() {
 
     dispatch(ducks.moveItem(draggableId, source, destination))
   }
+
+  useEffect(() => {
+    dispatch(data.fetchItems())
+  }, [])
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

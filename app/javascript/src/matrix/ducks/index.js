@@ -1,6 +1,7 @@
 import produce from 'immer'
 import { LexoRank } from 'lexorank'
-import { update, set, unset } from 'lodash/fp'
+import { keyBy, mapValues, pipe, set, unset, update } from 'lodash/fp'
+import { ducks as dataDucks } from '../../data'
 import getColumnTypeFilters from '../utils/getColumnTypeFilters'
 import sortColumnByRank from '../utils/sortColumnByRank'
 
@@ -66,6 +67,18 @@ const INITIAL_STATE = {
 /**
  * First-Level
  */
+function fetchedItemsSuccessReducer(state, action) {
+  const { data: { data } } = action.payload
+
+  const serialized = pipe(
+    keyBy('id'),
+    mapValues(datum => datum.attributes),
+  )(data)
+
+  return pipe(
+    set(['items'], serialized),
+  )(state)
+}
 function reassignItemReducer(state, action) {
   const { destination, draggableId } = action.payload
 
@@ -112,8 +125,6 @@ function reorderItemReducer(state, action) {
   const { items } = state
   const { destination, draggableId } = action.payload
   const column = sortColumnByRank(destination.droppableId, items)
-
-  console.log(`index: ${destination.index}, column: ${column.length}`)
 
   // move to first rank
   if (destination.index === 0) {
@@ -164,6 +175,8 @@ function moveItemReducer(state, action) {
 function reducer(state = INITIAL_STATE, action) {
   return produce(state, (draft) => {
     switch (action.type) {
+      case dataDucks.ITEMS_FETCHED_SUCCESS:
+        return fetchedItemsSuccessReducer(draft, action)
       case ITEM_ADDED:
         return addItemReducer(draft, action)
       case ITEM_MOVED:

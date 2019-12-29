@@ -7,7 +7,13 @@ Rails.application.routes.draw do
 
   # API
   namespace :api do
-    resources :todo_items
+    resources :todo_items do
+      member do
+        post 'complete'
+        post 'reopen'
+      end
+    end
+
     resources :todo_lists
   end
 
