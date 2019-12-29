@@ -1,9 +1,35 @@
 import React, { useState } from 'react'
-import { TextField } from 'office-ui-fabric-react/lib/TextField'
+import { IconButton } from 'office-ui-fabric-react'
+import { FontIcon } from 'office-ui-fabric-react/lib/Icon'
 import { Draggable } from 'react-beautiful-dnd'
 import { useDispatch } from 'react-redux'
 import ducks from '../ducks'
+import getMenuActions from '../utils/getMenuActions'
 import * as Styled from '../components/TodoColumn.styles'
+
+function useTextFieldPrefix(props) {
+  return () => <FontIcon iconName="GripperBarHorizontal" {...props} />
+}
+
+function useTextFieldSuffix(props) {
+  const {
+    menu,
+  } = props
+
+  return () => (
+    <React.Fragment>
+      <IconButton
+        menuIconProps={{ iconName: 'More' }}
+        menuProps={menu}
+        title="More Options"
+      />
+      <IconButton
+        iconProps={{ iconName: 'CheckMark' }}
+        title="Complete"
+      />
+    </React.Fragment>
+  )
+}
 
 function useTodoTask(type) {
   const dispatch = useDispatch()
@@ -28,6 +54,17 @@ function useTodoTask(type) {
       itemIndex,
     } = props
 
+    const menu = {
+      items: [
+        ...getMenuActions(dispatch)(type, item.id),
+        {
+          key: 'delete',
+          onClick: handleRemove(item.id),
+          text: 'Delete',
+        },
+      ],
+    }
+
     return (
       <Draggable key={item.id} draggableId={item.id} index={itemIndex}>
         {provided => (
@@ -36,13 +73,14 @@ function useTodoTask(type) {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
           >
-            <TextField
+            <Styled.TextField
               defaultValue={item.description}
               onChange={handleChange(item.id)}
+              onRenderPrefix={useTextFieldPrefix({ ...provided.dragHandleProps })}
+              onRenderSuffix={useTextFieldSuffix({ menu })}
               underlined
               value={textValue}
             />
-            <button onClick={handleRemove(item.id)}>Remove</button>
           </Styled.TaskItem>
         )}
       </Draggable>

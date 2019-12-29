@@ -61,13 +61,13 @@ function TodoColumn(props) {
 
       <Styled.ColumnContent>
         <Styled.ColumnInput
-          label="New Task:"
+          iconProps={{ iconName: 'Add' }}
           onChange={handleChange}
           underlined
           value={newTask}
         />
-
         <DetailsList
+          compact
           columns={COLUMNS}
           isHeaderVisible={false}
           items={items}

@@ -1,6 +1,6 @@
 import produce from 'immer'
 import { LexoRank } from 'lexorank'
-import { update, omit, set } from 'lodash/fp'
+import { update, set, unset } from 'lodash/fp'
 import getColumnTypeFilters from '../utils/getColumnTypeFilters'
 import sortColumnByRank from '../utils/sortColumnByRank'
 
@@ -75,7 +75,7 @@ function reassignItemReducer(state, action) {
   }))(state)
 }
 function removeItemReducer(state, action) {
-  return omit(['items', action.payload.id])(state)
+  return unset(['items', action.payload.id])(state)
 }
 function updateItemReducer(state, action) {
   const { id, type, ...values } = action.payload
@@ -110,9 +110,10 @@ function addItemReducer(state, action) {
 }
 function reorderItemReducer(state, action) {
   const { items } = state
-
   const { destination, draggableId } = action.payload
   const column = sortColumnByRank(destination.droppableId, items)
+
+  console.log(`index: ${destination.index}, column: ${column.length}`)
 
   // move to first rank
   if (destination.index === 0) {

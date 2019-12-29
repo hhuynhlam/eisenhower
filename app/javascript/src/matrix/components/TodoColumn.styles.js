@@ -1,6 +1,6 @@
-import { TextField } from 'office-ui-fabric-react/lib/TextField'
+import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox'
+import { TextField as FabTextField } from 'office-ui-fabric-react/lib/TextField'
 import styled from 'styled-components'
-import theme from 'config/theme'
 import constants from '../constants'
 
 const { COLUMN_TYPE } = constants
@@ -38,19 +38,29 @@ export const ColumnContent = styled.div`
     height: 100%;
   }
 `
-export const ColumnInput = styled(TextField)`
+export const ColumnInput = styled(SearchBox)`
   margin-bottom: 1rem;
-
-  & label {
-    padding-left: 0;
-  }
 `
 
 export const TaskItem = styled.div`
   align-items: center;
-  border-bottom: 1px solid ${theme.palette.grey};
   display: flex;
   font-size: 1rem;
   min-height: 38px;
   padding: 0.25rem 0;
+`
+
+export const TextField = styled(FabTextField)`
+  width: 100%;
+
+  & i {
+    font-size: 1.25rem;
+  }
+
+  & .ms-TextField-suffix {
+    padding: 0;
+  }
+  & .ms-TextField-prefix, & .ms-TextField-suffix {
+    background-color: transparent;
+  }
 `

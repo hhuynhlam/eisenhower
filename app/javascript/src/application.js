@@ -1,4 +1,5 @@
 import React from 'react'
+import { initializeIcons } from '@uifabric/icons'
 import { loadTheme } from 'office-ui-fabric-react'
 import { hot } from 'react-hot-loader'
 import { Provider } from 'react-redux'
@@ -10,6 +11,7 @@ import './styles/application.css'
 
 function App() {
   loadTheme(theme)
+  initializeIcons()
 
   return (
     <Provider store={store}>
